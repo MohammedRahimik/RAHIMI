@@ -1,0 +1,212 @@
+<!DOCTYPE html><html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سایت آگهی افغانستان</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      margin: 0;
+      background: #f1f1f1;
+    }
+    header {
+      background: #fff;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    #searchBox {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    #searchInput {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #locationSelect {
+      background: #eee;
+      padding: 6px 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: .9rem;
+      color: #d32f2f;
+    }
+    .category {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px;
+      background: #fff;
+      white-space: nowrap;
+    }
+    .category button {
+      padding: 8px 16px;
+      background: #ddd;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .category button.active {
+      background: #2196f3;
+      color: white;
+      font-weight: bold;
+    }
+    .ads {
+      padding: 10px;
+    }
+    .ad {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,.1);
+      cursor: pointer;
+    }
+    .ad img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .fixed-footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #ccc;
+      padding: 6px 0;
+      z-index: 20;
+    }
+    .fixed-footer button {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: .8rem;
+      color: #333;
+      cursor: pointer;
+    }
+    .icon {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .ad-details {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .ad-details .content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .close {
+      text-align: left;
+      font-size: 22px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>  <header>
+    <div id="searchBox">
+      <input id="searchInput" type="text" placeholder="جستجو...">
+      <select id="locationSelect">
+        <option value="all">📍 همه‌جا</option>
+        <option value="herat">📍 هرات</option>
+        <option value="kabul">📍 کابل</option>
+        <option disabled>📍 قندهار (به‌زودی)</option>
+        <option disabled>📍 بلخ (به‌زودی)</option>
+      </select>
+    </div>
+  </header>  <div class="category" id="categoryBar">
+    <button data-category="all" class="active">همه</button>
+    <button data-category="car">موتر</button>
+    <button data-category="mobile">موبایل</button>
+    <button data-category="home">خانه</button>
+    <button data-category="furniture">فرنیچر</button>
+    <button data-category="job">کار</button>
+    <button data-category="electronics">الکترونیک</button>
+    <button data-category="service">خدمات</button>
+    <button data-category="animals">حیوانات</button>
+    <button data-category="food">خوراکی</button>
+    <button data-category="clothes">لباس</button>
+  </div>  <div class="ads">
+    <div class="ad" data-city="herat" data-title="موتر فروشی" data-category="car" onclick="showDetails('موتر فروشی', 'تماس: 0700000000\nآدرس: پل خشتی هرات', 'https://via.placeholder.com/300')">
+      <img src="https://via.placeholder.com/300" alt="ad1">
+      <h4>موتر فروشی</h4>
+    </div>
+    <div class="ad" data-city="kabul" data-title="خانه کرایی" data-category="home" onclick="showDetails('خانه کرایی', 'تماس: 0799999999\nآدرس: شهرنو کابل', 'https://via.placeholder.com/300')">
+      <img src="https://via.placeholder.com/300" alt="ad2">
+      <h4>خانه کرایی</h4>
+    </div>
+  </div>  <div class="ad-details" id="adDetails">
+    <div class="content">
+      <div class="close" onclick="hideDetails()">✖</div>
+      <img id="detailImg" src="" style="width:100%; border-radius:10px;">
+      <h3 id="detailTitle"></h3>
+      <p id="detailDesc"></p>
+    </div>
+  </div>  <div class="fixed-footer">
+    <button><span class="icon">🏠</span><span>خانه</span></button>
+    <button><span class="icon">➕</span><span>ثبت آگهی</span></button>
+    <button><span class="icon">👤</span><span>پروفایل</span></button>
+  </div>  <script>
+    const searchInput = document.getElementById('searchInput');
+    const locationSelect = document.getElementById('locationSelect');
+    const ads = Array.from(document.querySelectorAll('.ad'));
+    const categoryButtons = document.querySelectorAll('.category button');
+
+    let currentCategory = 'all';
+
+    function filterAds() {
+      const term = searchInput.value.trim().toLowerCase();
+      const city = locationSelect.value;
+      ads.forEach(ad => {
+        const matchesCity = city === 'all' || ad.dataset.city === city;
+        const matchesTerm = ad.dataset.title.toLowerCase().includes(term);
+        const matchesCategory = currentCategory === 'all' || ad.dataset.category === currentCategory;
+        ad.style.display = (matchesCity && matchesTerm && matchesCategory) ? '' : 'none';
+      });
+    }
+
+    searchInput.addEventListener('input', filterAds);
+    locationSelect.addEventListener('change', filterAds);
+
+    categoryButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        categoryButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.dataset.category;
+        filterAds();
+      });
+    });
+
+    function showDetails(title, desc, img) {
+      document.getElementById('detailTitle').textContent = title;
+      document.getElementById('detailDesc').textContent = desc;
+      document.getElementById('detailImg').src = img;
+      document.getElementById('adDetails').style.display = 'flex';
+    }
+
+    function hideDetails() {
+      document.getElementById('adDetails').style.display = 'none';
+    }
+
+    filterAds();
+  </script></body>
+</html>
